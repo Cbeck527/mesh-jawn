@@ -1,0 +1,61 @@
+diff --git a/src/connections/stream_buffer.rs b/src/connections/stream_buffer.rs
+index 129ea77..4a27a8b 100644
+--- a/src/connections/stream_buffer.rs
++++ b/src/connections/stream_buffer.rs
+@@ -35,6 +35,7 @@ pub enum StreamBufferError {
+     #[error("Buffer does not contain a value at LSB buffer index of {lsb_index}")]
+     MissingLSB { lsb_index: usize },
+     #[error("Detected malformed packet, packet buffer contains a framing byte at index {next_packet_start_idx}")]
++    #[allow(dead_code)]
+     MalformedPacket { next_packet_start_idx: usize },
+     #[error(transparent)]
+     DecodeFailure(#[from] prost::DecodeError),
+@@ -274,6 +275,7 @@ impl StreamBuffer {
+         // In the event that the last byte is 0x94, we need to account for the possibility of
+         // the next byte being 0xc3, which would indicate that the packet is malformed.
+         // We can only do this when the buffer has enough data to avoid a slice index panic.
++        #[allow(unused_assignments)]
+         if self.buffer.len() > packet_data_end_index {
+             packet_data_end_index += 1;
+         }
+@@ -284,20 +286,26 @@ impl StreamBuffer {
+         //     packet_data_start_index + packet_data_size
+         // );
+ 
+-        let packet_buffer = self.buffer[packet_data_start_index..packet_data_end_index].to_vec();
+-
+-        let next_packet_start_index = StreamBuffer::find_framing_index(&packet_buffer)
+-            // We need to re-normalize to the original buffer since we're working with a sub-slice
+-            .map(|idx| idx + packet_data_start_index);
+-
+-        if let Some(next_packet_start_idx) = next_packet_start_index {
+-            // Remove malformed packet from buffer
+-            self.buffer.drain(..next_packet_start_idx);
+-
+-            return Err(StreamBufferError::MalformedPacket {
+-                next_packet_start_idx,
+-            });
+-        }
++        // TODO: Disabled malformed packet detection that causes false positives with UTF-8 emojis
++        // The check below searches for [0x94, 0xc3] magic bytes within packet data, but this
++        // creates false positives when legitimate protobuf data contains these bytes (e.g., emoji
++        // sequences in node names). This causes buffer corruption and stream desynchronization.
++        // See: https://github.com/meshtastic/rust/issues/XXXXXXXXXX
++        //
++        // let packet_buffer = self.buffer[packet_data_start_index..packet_data_end_index].to_vec();
++        //
++        // let next_packet_start_index = StreamBuffer::find_framing_index(&packet_buffer)
++        //     // We need to re-normalize to the original buffer since we're working with a sub-slice
++        //     .map(|idx| idx + packet_data_start_index);
++        //
++        // if let Some(next_packet_start_idx) = next_packet_start_index {
++        //     // Remove malformed packet from buffer
++        //     self.buffer.drain(..next_packet_start_idx);
++        //
++        //     return Err(StreamBufferError::MalformedPacket {
++        //         next_packet_start_idx,
++        //     });
++        // }
+ 
+         Ok(())
+     }
