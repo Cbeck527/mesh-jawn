@@ -1,0 +1,57 @@
+services:
+  nats:
+    image: nats:2.12-alpine
+    command: ["-js"]
+    ports:
+      - "4222:4222"
+    volumes:
+      - nats-data:/nats/data
+      # Alternatively, uncomment to use host directory instead
+      # - ./nats-data:/nats/data
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 4222 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # mesh-jawn relay: radio -> NATS
+  relay:
+    build:
+      context: ..  # Parent directory (includes meshtastic-rust dependency)
+      dockerfile: mesh-jawn/Dockerfile
+    network_mode: host
+    depends_on:
+      nats:
+        condition: service_healthy
+    restart: unless-stopped
+    command:
+      - "relay"
+      - "--nats-url"
+      - "nats://localhost:4222"
+      # Change to your radio's IP address
+      - "--radio"
+      - "10.10.10.191"
+      # Change if using non-default port!
+      # - "--radio-port"
+      # - "4403"           
+
+  # mesh-jawn bot
+  bot:
+    build:
+      context: ..  # Parent directory (includes meshtastic-rust dependency)
+      dockerfile: mesh-jawn/Dockerfile
+    depends_on:
+      nats:
+        condition: service_healthy
+      relay:
+        condition: service_started
+    restart: unless-stopped
+    command:
+      - "bot"
+      - "--nats-url"
+      - "nats://nats:4222"
+
+volumes:
+  nats-data:
+    driver: local

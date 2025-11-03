@@ -1,0 +1,4 @@
+/target
+
+# NATS config
+etc/nats/server.conf

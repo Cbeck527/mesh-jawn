@@ -1,0 +1,28 @@
+# Build artifacts
+target/
+*/target/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+*.md
+
+# IDE/AI
+.vscode/
+.idea/
+.claude/
+
+# Docker
+Dockerfile
+compose.yaml
+.dockerignore
+
+# NATS config (runtime only)
+etc/
+
+# Misc
+nats-data/
+.dir-locals.el
