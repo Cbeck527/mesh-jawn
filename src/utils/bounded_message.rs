@@ -67,7 +67,7 @@ mod tests {
         let truncated = truncate_message(&msg);
 
         // Should be exactly 200 bytes
-        assert_eq!(truncated.as_bytes().len(), MAX_MESSAGE_BYTES);
+        assert_eq!(truncated.len(), MAX_MESSAGE_BYTES);
 
         // Should end with suffix
         assert!(truncated.ends_with(TRUNCATION_SUFFIX));
@@ -82,7 +82,7 @@ mod tests {
         let truncated = truncate_message(&msg);
 
         // Should not panic and should be valid UTF-8
-        assert!(truncated.as_bytes().len() <= MAX_MESSAGE_BYTES);
+        assert!(truncated.len() <= MAX_MESSAGE_BYTES);
         assert!(truncated.ends_with(TRUNCATION_SUFFIX));
 
         // Verify it's valid UTF-8 by checking we can iterate chars
@@ -103,7 +103,7 @@ mod tests {
         let truncated = truncate_message(&msg);
 
         // Should be at or under limit
-        assert!(truncated.as_bytes().len() <= MAX_MESSAGE_BYTES);
+        assert!(truncated.len() <= MAX_MESSAGE_BYTES);
 
         // Should be valid UTF-8
         assert!(std::str::from_utf8(truncated.as_bytes()).is_ok());
@@ -121,7 +121,7 @@ mod tests {
         let msg = "a".repeat(201);
         let truncated = truncate_message(&msg);
 
-        assert_eq!(truncated.as_bytes().len(), MAX_MESSAGE_BYTES);
+        assert_eq!(truncated.len(), MAX_MESSAGE_BYTES);
         assert!(truncated.ends_with(TRUNCATION_SUFFIX));
     }
 }
