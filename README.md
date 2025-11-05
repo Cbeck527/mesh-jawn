@@ -38,22 +38,13 @@ mesh-jawn/
 > [!IMPORTANT]
 > Right now there's a [bug](https://github.com/meshtastic/rust/issues/71) in the
 > Meshtastic rust library that trips up the packet reader if there are emoji in
-> a node name. Right now I'm used a patched version of the library locally, and all
-> of my documentation assumes that you are doing the same.
-
-```bash
-# Clone this repo
-git clone https://github.com/Cbeck527/mesh-jawn.git
-
-# Clone the meshtastic-rust repository and apply patch
-git clone https://github.com/meshtastic/meshtastic-rust.git
-cd meshtastic-rust
-git apply ../mesh-jawn/etc/temp-disable-malformed-packet-detection.patch
-```
+> a node name. Right now I'm using my [personal fork  with a patch applied.](https://github.com/Cbeck527/meshtastic-rust/tree/disable-malformed-packet-detection)
 
 ### Docker
 
 ``` bash
+git clone https://github.com/Cbeck527/mesh-jawn.git
+
 # ... Edit docker-compose.yaml to set your radio's IP address ...
 
 # Start all services

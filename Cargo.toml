@@ -10,7 +10,7 @@ license = "MIT"
 keywords = ["meshtastic", "nats", "philly", "jawn"]
 
 [dependencies]
-meshtastic = { path = "../meshtastic-rust", features = ["tokio"] }
+meshtastic = { git = "https://github.com/cbeck527/meshtastic-rust", branch = "disable-malformed-packet-detection", features = ["tokio"] }
 tokio = { version = "1.48.0", features = ["full"] }
 clap = { version = "4.5", features = ["derive"] }
 tracing = "0.1"
